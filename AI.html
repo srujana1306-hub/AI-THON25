@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus AI Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: flex;
+            min-height: 600px;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: #f8f9fa;
+            border-right: 1px solid #e9ecef;
+            padding: 30px 20px;
+        }
+
+        .info-section {
+            margin-bottom: 30px;
+        }
+
+        .info-section h3 {
+            color: #2E7D32;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+        }
+
+        .info-section .icon {
+            margin-right: 10px;
+            font-size: 1.5em;
+        }
+
+        .info-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .info-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .info-item h4 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .info-item p {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+
+        .chat-header {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            text-align: center;
+        }
+
+        .chat-header h2 {
+            color: #333;
+            font-size: 1.5em;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 400px;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: 20px;
+            position: relative;
+        }
+
+        .message.bot .message-content {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            color: #1565c0;
+            border-bottom-left-radius: 5px;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #4CAF50, #66BB6A);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin: 0 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+
+        .message.bot .message-avatar {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+        }
+
+        .message.user .message-avatar {
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            font-size: 1em;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+        }
+
+        .send-button {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, #4CAF50, #66BB6A);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .send-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .quick-action {
+            padding: 8px 15px;
+            background: #e3f2fd;
+            color: #1565c0;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .quick-action:hover {
+            background: #1565c0;
+            color: white;
+        }
+
+        .typing-indicator {
+            display: none;
+            color: #666;
+            font-style: italic;
+            padding: 10px 0;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                max-height: 300px;
+                overflow-y: auto;
+            }
+            
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .welcome-message h3 {
+            color: #4CAF50;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Campus AI Assistant</h1>
+            <p>Your intelligent guide to campus life and services</p>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="info-section">
+                    <h3><span class="icon">📚</span>Academic</h3>
+                    <div class="info-item" onclick="quickQuery('academic schedule')">
+                        <h4>Class Schedule</h4>
+                        <p>View current semester schedule</p>
+                    </div>
+                    <div class="info-item" onclick="quickQuery('exam dates')">
+                        <h4>Exam Schedule</h4>
+                        <p>Upcoming examination dates</p>
+                    </div>
+                    <div class="info-item" onclick="quickQuery('course registration')">
+                        <h4>Course Registration</h4>
+                        <p>Registration procedures</p>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3><span class="icon">🏢</span>Facilities</h3>
+                    <div class="info-item" onclick="quickQuery('library hours')">
+                        <h4>Library</h4>
+                        <p>Hours: 8 AM - 10 PM</p>
+                    </div>
+                    <div class="info-item" onclick="quickQuery('cafeteria menu')">
+                        <h4>Dining Services</h4>
+                        <p>Cafeteria & meal plans</p>
+                    </div>
+                    <div class="info-item" onclick="quickQuery('gym facilities')">
+                        <h4>Recreation Center</h4>
+                        <p>Fitness & sports facilities</p>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3><span class="icon">🎉</span>Events</h3>
+                    <div class="info-item" onclick="quickQuery('campus events')">
+                        <h4>Upcoming Events</h4>
+                        <p>Campus activities & programs</p>
+                    </div>
+                    <div class="info-item" onclick="quickQuery('club activities')">
+                        <h4>Student Clubs</h4>
+                        <p>Club meetings & activities</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h2>💬 Chat with Campus Assistant</h2>
+                </div>
+
+                <div class="chat-messages" id="chatMessages">
+                    <div class="welcome-message">
+                        <h3>Welcome to Campus AI Assistant! 👋</h3>
+                        <p>I'm here to help you with:</p>
+                        <ul style="text-align: left; margin: 20px 0;">
+                            <li>Academic schedules and course information</li>
+                            <li>Campus facilities and their timings</li>
+                            <li>Dining services and meal plans</li>
+                            <li>Library resources and study spaces</li>
+                            <li>Administrative procedures</li>
+                            <li>Campus events and activities</li>
+                        </ul>
+                        <p>Ask me anything or click on the quick actions below!</p>
+                    </div>
+                </div>
+
+                <div class="chat-input-container">
+                    <div class="quick-actions">
+                        <button class="quick-action" onclick="quickQuery('What are the library hours?')">Library Hours</button>
+                        <button class="quick-action" onclick="quickQuery('How do I register for courses?')">Course Registration</button>
+                        <button class="quick-action" onclick="quickQuery('What events are happening this week?')">Campus Events</button>
+                        <button class="quick-action" onclick="quickQuery('Where can I find study spaces?')">Study Spaces</button>
+                    </div>
+                    <div class="typing-indicator" id="typingIndicator">AI Assistant is thinking...</div>
+                    <div class="chat-input-wrapper">
+                        <input type="text" class="chat-input" id="chatInput" placeholder="Ask me anything about campus..." onkeypress="handleKeyPress(event)">
+                        <button class="send-button" onclick="sendMessage()">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Knowledge base for campus information
+        const campusKnowledge = {
+            academic: {
+                schedule: "Fall 2024 classes run from August 28 - December 15. Spring 2025 registration opens November 15. Final exams are scheduled for December 9-15.",
+                registration: "Course registration is done through the student portal. Priority registration begins for seniors on November 1, juniors on November 3, sophomores on November 5, and freshmen on November 7.",
+                exams: "Midterm exams: October 14-18. Final exams: December 9-15. Make-up exams must be arranged with your instructor within 48 hours of the missed exam."
+            },
+            facilities: {
+                library: "The main library is open Monday-Thursday 8 AM-10 PM, Friday-Saturday 8 AM-8 PM, Sunday 10 AM-10 PM. Special collections close 2 hours earlier. Free wifi and study rooms available.",
+                dining: "Main cafeteria hours: Breakfast 7-10 AM, Lunch 11 AM-3 PM, Dinner 5-9 PM. Meal plans range from $2,400-$3,800 per semester. Various dietary options available.",
+                gym: "Recreation Center hours: Monday-Friday 6 AM-11 PM, Saturday-Sunday 8 AM-10 PM. Facilities include fitness equipment, basketball courts, swimming pool, and group fitness classes."
+            },
+            services: {
+                parking: "Student parking permits: $200/semester for general lots, $400/semester for premium lots. Visitor parking is $5/day. Electric vehicle charging stations available.",
+                health: "Student Health Center: Monday-Friday 8 AM-5 PM. Services include routine care, vaccinations, mental health counseling. Emergency services available 24/7.",
+                IT: "IT Help Desk: Monday-Friday 8 AM-6 PM in the Technology Center. Services include device setup, software installation, network troubleshooting."
+            },
+            events: {
+                upcoming: "This week: Career Fair (Oct 15), Homecoming Dance (Oct 16), Guest Lecture Series (Oct 17), Club Fair (Oct 18). Check the campus events calendar for full details.",
+                clubs: "Over 150 student organizations available. Popular clubs include Student Government, Drama Club, Environmental Society, and various academic honor societies."
+            }
+        };
+
+        // AI response patterns
+        const responsePatterns = [
+            {
+                keywords: ['library', 'study', 'books', 'research'],
+                response: () => `📚 ${campusKnowledge.facilities.library} Need help finding specific resources? I can connect you with a librarian!`
+            },
+            {
+                keywords: ['food', 'cafeteria', 'dining', 'meal', 'eat'],
+                response: () => `🍽️ ${campusKnowledge.facilities.dining} Special dietary needs? Contact dining services at dining@campus.edu`
+            },
+            {
+                keywords: ['gym', 'fitness', 'recreation', 'sports', 'exercise'],
+                response: () => `💪 ${campusKnowledge.facilities.gym} Want to join intramural sports? Check out our athletics program!`
+            },
+            {
+                keywords: ['registration', 'register', 'courses', 'classes', 'enroll'],
+                response: () => `📝 ${campusKnowledge.academic.registration} Need help choosing courses? Visit the Academic Advising Center!`
+            },
+            {
+                keywords: ['schedule', 'calendar', 'semester', 'dates'],
+                response: () => `📅 ${campusKnowledge.academic.schedule} Important dates are also posted on the student portal.`
+            },
+            {
+                keywords: ['exam', 'test', 'final', 'midterm'],
+                response: () => `📋 ${campusKnowledge.academic.exams} Need study tips? The Academic Success Center offers tutoring services!`
+            },
+            {
+                keywords: ['events', 'activities', 'happening', 'fun'],
+                response: () => `🎉 ${campusKnowledge.events.upcoming} Follow @CampusLife on social media for real-time updates!`
+            },
+            {
+                keywords: ['clubs', 'organizations', 'join', 'meet'],
+                response: () => `🤝 ${campusKnowledge.events.clubs} Visit the Student Life Office to learn about joining clubs and leadership opportunities.`
+            },
+            {
+                keywords: ['parking', 'car', 'permit'],
+                response: () => `🚗 ${campusKnowledge.services.parking} Apply for permits online through the student portal.`
+            },
+            {
+                keywords: ['health', 'medical', 'doctor', 'sick'],
+                response: () => `🏥 ${campusKnowledge.services.health} For serious emergencies, call 911. For urgent but non-emergency care, call campus security.`
+            },
+            {
+                keywords: ['wifi', 'internet', 'computer', 'tech', 'IT'],
+                response: () => `💻 ${campusKnowledge.services.IT} Connect to 'Campus-WiFi' with your student credentials for internet access.`
+            }
+        ];
+
+        function addMessage(content, isUser = false) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const welcomeMessage = messagesContainer.querySelector('.welcome-message');
+            
+            if (welcomeMessage) {
+                welcomeMessage.remove();
+            }
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = isUser ? 'YOU' : 'AI';
+            
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            messageContent.innerHTML = content;
+            
+            if (isUser) {
+                messageDiv.appendChild(messageContent);
+                messageDiv.appendChild(avatar);
+            } else {
+                messageDiv.appendChild(avatar);
+                messageDiv.appendChild(messageContent);
+            }
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function getAIResponse(userInput) {
+            const input = userInput.toLowerCase();
+            
+            // Check for greeting
+            if (input.includes('hello') || input.includes('hi') || input.includes('hey')) {
+                return "👋 Hello! I'm your Campus AI Assistant. I'm here to help you with information about academics, facilities, dining, events, and more. What would you like to know?";
+            }
+            
+            // Check for thanks
+            if (input.includes('thank') || input.includes('thanks')) {
+                return "😊 You're welcome! I'm always here to help. Is there anything else you'd like to know about campus?";
+            }
+            
+            // Match against knowledge patterns
+            for (let pattern of responsePatterns) {
+                if (pattern.keywords.some(keyword => input.includes(keyword))) {
+                    return pattern.response();
+                }
+            }
+            
+            // Fallback responses for unmatched queries
+            const fallbackResponses = [
+                "🤔 I'd be happy to help you with that! For specific information not in my knowledge base, I recommend contacting the relevant campus department directly.",
+                "🔍 That's a great question! While I don't have specific information about that topic, you can find more details on the campus website or by visiting the Student Services office.",
+                "💡 I want to make sure I give you accurate information. For detailed answers about that topic, please check with the appropriate campus office or visit the student portal.",
+                "📞 For that specific query, I'd recommend contacting the campus information desk at (555) 123-4567 or visiting the student services center in the main administration building."
+            ];
+            
+            return fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
+        }
+
+        function showTypingIndicator() {
+            document.getElementById('typingIndicator').style.display = 'block';
+        }
+
+        function hideTypingIndicator() {
+            document.getElementById('typingIndicator').style.display = 'none';
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (message) {
+                addMessage(message, true);
+                input.value = '';
+                
+                showTypingIndicator();
+                
+                setTimeout(() => {
+                    hideTypingIndicator();
+                    const response = getAIResponse(message);
+                    addMessage(response, false);
+                }, 1000 + Math.random() * 1000); // Simulate thinking time
+            }
+        }
+
+        function quickQuery(query) {
+            const input = document.getElementById('chatInput');
+            input.value = query;
+            sendMessage();
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // Focus on input when page loads
+        window.onload = function() {
+            document.getElementById('chatInput').focus();
+        };
+    </script>
+</body>
+</html>
